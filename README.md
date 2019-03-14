@@ -9,4 +9,5 @@
   sudo cp ups.sh /etc/init.d/
 
 #update the rc file
+
   sudo update-rc.d ups.sh defaults
