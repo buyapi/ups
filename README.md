@@ -3,7 +3,6 @@
 ### download the needed files
 ```
   wget -nd https://raw.githubusercontent.com/buyapi/ups/master/scripts/ups
-
   wget -nd https://raw.githubusercontent.com/buyapi/ups/master/scripts/ups.service
 ```
 ### open the main ups script via nano or vim, and modify the following line as needed
