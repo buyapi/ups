@@ -25,7 +25,7 @@ power_timer=0;
 ups_online_timer=0;
 
 # time parameters
-pwoff_timer_min=30; # modify this number to whatever number of minutes you see fit to run the system on batteries before shutdown.
+pwoff_timer_min=10; # modify this number to whatever number of minutes you see fit to run the system on batteries before shutdown.
 readonly TMP_TMR=$pwoff_timer_min;
 
 
