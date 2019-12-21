@@ -6,9 +6,9 @@
 
   wget -nd https://raw.githubusercontent.com/buyapi/ups/master/scripts/ups.service
 
-# open the script via nano or vim, and modify the following line as needed
+# open the main ups script via nano or vim, and modify the following line as needed
 
-  timer_min=10;
+  pwoff_timer_min=10;
 
 # change the permissions for the scripts
 
