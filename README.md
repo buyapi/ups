@@ -2,7 +2,8 @@
 
 # download the needed files
 
-  wget -nd 
+  wget -nd https://raw.githubusercontent.com/buyapi/ups/master/scripts/ups
+  wget -nd https://raw.githubusercontent.com/buyapi/ups/master/scripts/ups.service
 
 # open the script via nano or vim, and modify the following line as needed
 
