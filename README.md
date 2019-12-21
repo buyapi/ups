@@ -1,13 +1,16 @@
-## bash script to talk to the ups board
+## bash script for the Raspberry Pi to communicate with the ups board
 
-#change the permissions for the script 
+# download the needed file
+
+# open the script via nano or vim, and modify the following line as needed
+
+  timer_min=10;
+
+# change the permissions for the script 
 
   sudo chmod 511 ups
 
-#copy the script to the init.d directory to run the script on startup
+# move the script to the bin directory 
 
-  sudo cp ups /etc/init.d/
+  sudo mv -f ups /bin/
 
-#update the rc file
-
-  sudo update-rc.d ups defaults
