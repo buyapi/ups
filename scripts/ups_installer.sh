@@ -12,7 +12,7 @@ chmod --changes u=rx,g=rx,o=r ups.service;
 chown --changes root:root ups;
 chown --changes root:root ups.service;
 
-if [ "$os" = "LIBREELEC" ] || [ "$os" = "OPENELEC" ] || [ "$os" = "OSMC" ]
+if [ "$os" = "LIBREELEC" ] || [ "$os" = "OPENELEC" ]
 then
         # these will run as normal, as the default user account is root
 
