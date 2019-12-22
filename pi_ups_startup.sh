@@ -29,10 +29,10 @@ else
     chmod --changes u=rx,g=rx,o=r ups;
     chown --changes root:root ups;
     
-    wget --non-verbose --tries=3 https://raw.githubusercontent.com/buyapi/ups/master/scripts/ups.service;
-    chmod --changes u=rx,g=rx,o=r ups.service;
-    chown --changes root:root ups.service;
+    wget --non-verbose --tries=3 https://raw.githubusercontent.com/buyapi/ups/master/scripts/std_linux.ups.service;
+    chmod --changes u=rx,g=rx,o=r std_linux.ups.service;
+    chown --changes root:root std_linux.ups.service;
 
     mv --force ups /bin/;
-    mv --force ups.service /etc/systemd/system/;
+    mv --force std_linux.ups.service /etc/systemd/system/;
 fi
