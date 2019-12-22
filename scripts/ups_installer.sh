@@ -9,11 +9,8 @@ wget -nd https://raw.githubusercontent.com/buyapi/ups/master/scripts/ups.service
 chmod 0510 ups;
 chmod 0510 ups.service;
 
-chown root ups;
-chown root ups.service;
-
-chgrp root ups;
-chgrp root ups.service;
+chown -f root:root ups;
+chown -f root:root ups.service;
 
 if [ "$os" = "LIBREELEC" ] || [ "$os" = "OPENELEC" ]
 then
@@ -27,4 +24,4 @@ then
 else
         mv -f ups /bin/;
         mv -f ups.service /etc/systemd/system/;
-fi0
+fi
