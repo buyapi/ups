@@ -1,24 +1,10 @@
 # bash script for the Raspberry Pi to communicate with the ups board
 
-### download the needed files
+### Download the initialization script
 ```
-  wget -nd https://raw.githubusercontent.com/buyapi/ups/master/scripts/ups
-  wget -nd https://raw.githubusercontent.com/buyapi/ups/master/scripts/ups.service
+  wget -nd https://raw.githubusercontent.com/buyapi/ups/master/pi_ups_startup.sh
 ```
-### open the main ups script via nano or vim, and modify the following line as needed
+### Run the script
 ```
-  pwoff_timer_min=10;
-```
-### change the permissions for the scripts
-```
-  sudo chmod 511 ups
-  sudo chmod 511 ups.service
-```
-### move the script to the bin directory 
-```
-  sudo mv -f ups /bin/
-```
-### move the service file to the systemd directory 
-```
-  sudo mv -f ups.service /etc/systemd/system
+  pi_ups_startup.sh
 ```
