@@ -1,0 +1,95 @@
+#!/bin/sh
+
+# GPIO17 (input) used to read current power status. 
+# 0 - normal (or battery power was switched on manually). 
+# 1 - main power fault in USB-C (RPi4) or MicroUSB; switched to battery power. 
+printf 17 > /sys/class/gpio/export;
+printf in > /sys/class/gpio/gpio17/direction;
+
+# GPIO27 (input) used to indicate that UPS is online
+printf 27 > /sys/class/gpio/export;
+printf in > /sys/class/gpio/gpio27/direction;
+
+# GPIO18 used to inform UPS that Pi is still working. After power-off this pin returns to Hi-Z state. 
+printf 18 > /sys/class/gpio/export;
+printf out > /sys/class/gpio/gpio18/direction;
+printf 0 > /sys/class/gpio/gpio18/value;
+
+# variables used to store GPIO states
+inval_power="0";
+ups_online1="0";
+ups_online2="0";
+
+# variables used in incremental calculations
+power_timer=0;
+ups_online_timer=0;
+
+# time parameters
+pwoff_timer_min=10; # modify this number to whatever number of minutes you see fit to run the system on batteries before shutdown.
+readonly TMP_TMR=$pwoff_timer_min;
+
+
+while true
+do
+	# read GPIO27 pin value
+	# normally, UPS toggles this pin every 0.5s
+	ups_online1=$(cat /sys/class/gpio/gpio27/value);
+	
+	sleep 0.1;
+	
+	ups_online2=$(cat /sys/class/gpio/gpio27/value);
+	
+	ups_online_timer=${ups_online_timer+1};
+	
+	# toggled?
+	if  [ "$ups_online1" != "$ups_online2" ]
+	then
+		ups_online_timer=0;
+	fi
+	
+	# end script if ups is offline longer than 5 seconds (no toggling detected)
+	if [ $ups_online_timer -gt 50 ] 
+	then		
+		printf "The UPS is offline. Exiting...";
+		printf "To reinitialize the script, please restart the system by entering \"sudo shutdown -r now\"";
+		exit;
+	fi		
+
+	# read GPIO17 pin value
+	inval_power=$(cat /sys/class/gpio/gpio17/value);
+	
+	if [ "$inval_power" = 1 ]
+	then
+		if [ $power_timer -le 0 ]
+		then
+			printf "\e[1;31;1mERROR: The system has lost connection to mains power. Power will transition to battery for 30 minutes, and then safely shut down.\e[0m\n";
+			/sbin/shutdown -P +$TMP_TMR;
+			power_timer=1;
+		else
+			power_timer=${power_timer+1};
+			div_rem=$power_timer%600;
+			
+			if [ $div_rem -eq 0 ]
+			then
+				pwoff_timer_min=${pwoff_timer_min-1};
+				
+				if [ $pwoff_timer_min -gt 1 ]
+				then
+					printf "\e[1;33;1m--%d minutes remaining until safe shutdown--\e[0m\n" $pwoff_timer_min;
+				elif [ $pwoff_timer_min -eq 1 ]
+				then
+					printf "\e[1;33;1m--1 minute remaining until safe shutdown--\e[0m\n";
+					printf "\e[1;33;1mWARNING: Please save your work.\e[0m\n";
+				fi
+			fi
+		fi
+	else 
+		if [ $power_timer -gt 0 ]
+		then
+			printf "\e[1;32;1mNOTICE: Power mains has returned to service. Battery is now charging.\e[0m";
+			/sbin/shutdown -c;
+			power_timer=0;
+			pwoff_timer_min=$TMP_TMR;
+		fi
+	fi
+done

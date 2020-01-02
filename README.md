@@ -1,13 +1,9 @@
-## bash script to talk to the ups board
-
-#change the permissions for the script 
-
-  sudo chmod +x ups.sh
-
-#copy the script to the init.d directory to run the script on startup
-
-  sudo cp ups.sh /etc/init.d/
-
-#update the rc file
-
-  sudo update-rc.d ups.sh defaults
+# howto:
+### Download the initialization script
+```
+  wget -nd https://raw.githubusercontent.com/buyapi/ups/master/pi_ups_startup.sh
+```
+### Run the script
+```
+  pi_ups_startup.sh
+```
