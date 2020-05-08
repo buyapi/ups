@@ -150,7 +150,7 @@ if __name__ == '__main__':
     import traceback
 
     log_file = "../logs/ups.log"
-    path, del, filename = log_file.rpartition('/')
+    path, dlm, filename = log_file.rpartition('/')
 
     if not os.path.exists(path):
         os.mkdir(path, mode=0o775)
