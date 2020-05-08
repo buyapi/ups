@@ -110,7 +110,7 @@ class BuyAPiUPS(LoggingConfig):
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
         [GPIO.setup(*mode) for mode in self.CHANNELS]
-        GPIO.outpou(self.GPIO18, 0)
+        GPIO.output(self.GPIO18, 0)
 
     def _is_ups_running(self):
         toggle_high = 0
@@ -132,7 +132,7 @@ class BuyAPiUPS(LoggingConfig):
         return result
 
     def _is_close(self, high, low):
-        return abs(high - low) <= self._WINDOW:
+        return abs(high - low) <= self._WINDOW
 
     def _is_power_failure(self):
         value = GPIO.input(self.GPIO17)
