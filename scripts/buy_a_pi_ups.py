@@ -52,8 +52,8 @@ class BuyAPiUPS(LoggingConfig):
     GPIO27 = 27
     GPIO18 = 18
     CHANNELS = [(GPIO17, GPIO.IN), (GPIO27, GPIO.IN), (GPIO18, GPIO.OUT)]
-    _ITERATIONS = 6     # Number of times to run UPS online check.
-    _WINDOW = 2         # Allowable deviation from normal.
+    _ITERATIONS = 6    # Number of times to run UPS online check.
+    _WINDOW = 2        # Allowable deviation from normal.
     DEFAULT_DELAY = 60 # 60 seconds
 
     def __init__(self, log_file=DEFAULT_LOG_FILE, exit_no_ups=False,
@@ -68,7 +68,7 @@ class BuyAPiUPS(LoggingConfig):
         debug       -- Set to True to turn on debug logging, defaults to False.
         """
         super().__init__(log_file=log_file,
-                         level=logging.DEBUG if debug else logging.WARNING)
+                         level=logging.DEBUG if debug else logging.INFO)
         self.exit_no_ups = exit_no_ups
         self.delay = timedelta(seconds=delay)
         self.pwr_lost_time = None
@@ -77,7 +77,8 @@ class BuyAPiUPS(LoggingConfig):
         signal.signal(signal.SIGTERM, self.handle_terminate_signal)
 
     def run(self):
-        self.log.info("Starting BuyAPi UPS...")
+        start_dt = datetime.now().isoformat()
+        self.log.info("Starting BuyAPi UPS at %s...", start_dt)
         self._setup()
 
         try:
@@ -112,7 +113,8 @@ class BuyAPiUPS(LoggingConfig):
             self.log.warn("Exception raised: %s", e, exc_info=True)
         finally:
             self._teardown()
-            self.log.info("...Existing BuyAPi UPS")
+            end_dt = datetime.now().isoformat()
+            self.log.info("...Existing BuyAPi UPS at %s", end_dt)
 
             if self.shutdown:
                 os.system("sudo poweroff")
@@ -180,8 +182,8 @@ if __name__ == '__main__':
                         help="If set False this script will keep running if "
                         "no ups Hat is found (default True).")
     parser.add_argument('-D', '--debug', action='store_true', default=False,
-                        dest='debug', help="Run in debug mode (dumps a lot "
-                        "of log statements).")
+                        dest='debug', help="Run in debug mode, dumps a lot "
+                        "of log statements (default is INFO level).")
     options = parser.parse_args()
 
     if not options.log_file:
