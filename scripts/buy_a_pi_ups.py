@@ -151,8 +151,8 @@ class BuyAPiUPS(LoggingConfig):
 
     @property
     def read_gpio_18(self):
-        if GPIO.gpio_function(GPIO18) != GPIO.IN:
-            GPIO.setup(GPIO18, GPIO.IN)
+        if GPIO.gpio_function(self.GPIO18) != GPIO.IN:
+            GPIO.setup(self.GPIO18, GPIO.IN)
 
         return GPIO.input(self.GPIO18)
 
