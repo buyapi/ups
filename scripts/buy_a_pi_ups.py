@@ -33,7 +33,7 @@ class LoggingConfig:
 
     def _config_logging(self):
         """
-        Run basicConfig and setint the log format, file, and level.
+        Run basicConfig and set the log format, file, and level.
 
         Returns: The logger object.
         """
@@ -52,27 +52,28 @@ class BuyAPiUPS(LoggingConfig):
     GPIO27 = 27
     GPIO18 = 18
     CHANNELS = [(GPIO17, GPIO.IN), (GPIO27, GPIO.IN), (GPIO18, GPIO.OUT)]
-    _ITERATIONS = 6 # Number of times to run UPS online check.
-    _WINDOW = 2 # Allowable deviation from normal.
-    _DEFAULT_TIMEOUT = 60 # 60 seconds
+    _ITERATIONS = 6     # Number of times to run UPS online check.
+    _WINDOW = 2         # Allowable deviation from normal.
+    _DEFAULT_DELAY = 60 # 60 seconds
 
     def __init__(self, log_file=DEFAULT_LOG_FILE, exit_no_ups=False,
-                 timeout=_DEFAULT_TIMEOUT, debug=False):
+                 delay=_DEFAULT_DELAY, debug=False):
         """
         Constructor
 
         log_file    -- Path including the log file
         exit_no_ups -- Cleanly exit the ups script if no HAT.
-        timeout     -- Timeout in seconds to determine how long to wait
+        delay       -- Delay in seconds to determine how long to wait
                        before shutdown.
         debug       -- Set to True to turn on debug logging, defaults to False.
         """
         super().__init__(log_file=log_file,
                          level=logging.DEBUG if debug else logging.WARNING)
         self.exit_no_ups = exit_no_ups
-        self.timeout = timedelta(seconds=timeout)
+        self.delay = timedelta(seconds=delay)
         self.pwr_lost_time = None
         self.terminate = False
+        self.shutdown = False
         signal.signal(signal.SIGTERM, self.handle_terminate_signal)
 
     def run(self):
@@ -92,16 +93,17 @@ class BuyAPiUPS(LoggingConfig):
                         self.pwr_lost_time = None
 
                     self.log.debug(
-                        "pwr_lost_time: %s, timeout: %s GPIO 17: %s",
-                        self.pwr_lost_time, self.timeout, self.read_gpio_17)
+                        "pwr_lost_time: %s, delay: %s GPIO 17: %s",
+                        self.pwr_lost_time, self.delay, self.read_gpio_17)
                     now = datetime.now()
 
                     if (self.pwr_lost_time
-                        and (self.pwr_lost_time + self.timeout) <= now):
-                        self.log.warn(
-                            "RPi Power lost at: %s, Shoutdown at: %s",
-                            self.pwr_lost_time, now)
-                        os.system("sudo poweroff")
+                        and (self.pwr_lost_time + self.delay) <= now):
+                        self.log.warn("RPi Power lost at: %s, "
+                                      "Shutdown at: %s, elapsed time: %s",
+                                      self.pwr_lost_time, now,
+                                      now - self.pwr_lost_time)
+                        self.shutdown = True
                         break
                 elif self.exit_no_ups:
                     self.log.info("No UPS HAT waiting to exit.")
@@ -111,6 +113,9 @@ class BuyAPiUPS(LoggingConfig):
         finally:
             self._teardown()
             self.log.info("...Existing BuyAPi UPS")
+
+            if self.shutdown:
+                os.system("sudo poweroff")
 
     def _setup(self):
         GPIO.setwarnings(False)
@@ -158,22 +163,37 @@ class BuyAPiUPS(LoggingConfig):
 
 
 if __name__ == '__main__':
+    import argparse
     import sys
     import traceback
 
-    log_file = "../logs/ups.log"
-    path, dlm, filename = log_file.rpartition('/')
+    parser = argparse.ArgumentParser(description=("UPS processing..."))
+    parser.add_argument('-l', '--log-file', type=str, default='',
+                        dest='log_file',
+                        help="Log file path (Do not use relative paths and "
+                        "the default is /var/log/ups.log).")
+    parser.add_argument('-d', '--delay', type=int, dest='delay',
+                        help="Enter the delay before shutdown in seconds "
+                        "(default is 60 seconds).")
+    parser.add_argument('-e', '--exit-no-ups', action='store_true',
+                        default=True, dest='exit_no_ups',
+                        help="If set False this scrip will keep running if "
+                        "no ups Hat is found (default True).")
+    parser.add_argument('-D', '--debug', action='store_true', default=False,
+                        dest='debug', help="Run in debug mode.")
+    options = parser.parse_args()
 
-    if not os.path.exists(path):
-        os.mkdir(path, mode=0o775)
+    if not options.log_file:
+        log_file = BuyAPiUPS.DEFAULT_LOG_FILE
 
     try:
-        ups = BuyAPiUPS(log_file=log_file, debug=True)
+        ups = BuyAPiUPS(log_file=log_file, delay=options.delay,
+                        exit_no_ups=options.exit_no_ups, debug=options.debug)
         ups.run()
     except BaseException as e:
         tb = sys.exc_info()[2]
         traceback.print_tb(tb)
         print("{}: {}".format(sys.exc_info()[0], sys.exc_info()[1]))
         sys.exit(1)
-
-    sys.exit(0)
+    else:
+        sys.exit(0)
