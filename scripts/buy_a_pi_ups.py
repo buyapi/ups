@@ -54,10 +54,10 @@ class BuyAPiUPS(LoggingConfig):
     CHANNELS = [(GPIO17, GPIO.IN), (GPIO27, GPIO.IN), (GPIO18, GPIO.OUT)]
     _ITERATIONS = 6     # Number of times to run UPS online check.
     _WINDOW = 2         # Allowable deviation from normal.
-    _DEFAULT_DELAY = 60 # 60 seconds
+    DEFAULT_DELAY = 60 # 60 seconds
 
     def __init__(self, log_file=DEFAULT_LOG_FILE, exit_no_ups=False,
-                 delay=_DEFAULT_DELAY, debug=False):
+                 delay=DEFAULT_DELAY, debug=False):
         """
         Constructor
 
@@ -170,24 +170,33 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=("UPS processing..."))
     parser.add_argument('-l', '--log-file', type=str, default='',
                         dest='log_file',
-                        help="Log file path (Do not use relative paths and "
-                        "the default is /var/log/ups.log).")
+                        help="Log file path (Use absolute paths only default "
+                        "is /var/log/ups.log).")
     parser.add_argument('-d', '--delay', type=int, dest='delay',
                         help="Enter the delay before shutdown in seconds "
                         "(default is 60 seconds).")
     parser.add_argument('-e', '--exit-no-ups', action='store_true',
                         default=True, dest='exit_no_ups',
-                        help="If set False this scrip will keep running if "
+                        help="If set False this script will keep running if "
                         "no ups Hat is found (default True).")
     parser.add_argument('-D', '--debug', action='store_true', default=False,
-                        dest='debug', help="Run in debug mode.")
+                        dest='debug', help="Run in debug mode (dumps a lot "
+                        "of log statements).")
     options = parser.parse_args()
 
     if not options.log_file:
-        log_file = BuyAPiUPS.DEFAULT_LOG_FILE
+        options.log_file = BuyAPiUPS.DEFAULT_LOG_FILE
+
+    path, filename = os.path.split(options.log_file)
+
+    if not os.path.exists(path):
+        os.makedirs(path, mode=0o775, exist_ok=True)
+
+    if not options.delay:
+        options.delay = BuyAPiUPS.DEFAULT_DELAY
 
     try:
-        ups = BuyAPiUPS(log_file=log_file, delay=options.delay,
+        ups = BuyAPiUPS(log_file=options.log_file, delay=options.delay,
                         exit_no_ups=options.exit_no_ups, debug=options.debug)
         ups.run()
     except BaseException as e:
