@@ -91,10 +91,9 @@ class BuyAPiUPS(LoggingConfig):
                     else:
                         self.pwr_lost_time = None
 
-                    self.log.debug("pwr_lost_time: %s, timeout: %s "
-                                   "GPIO 17: %s, GPIO 18: %s",
-                                   self.pwr_lost_time, self.timeout,
-                                   self.read_gpio_17, self.read_gpio_18)
+                    self.log.debug(
+                        "pwr_lost_time: %s, timeout: %s GPIO 17: %s",
+                        self.pwr_lost_time, self.timeout, self.read_gpio_17)
                     now = datetime.now()
 
                     if (self.pwr_lost_time
@@ -148,13 +147,6 @@ class BuyAPiUPS(LoggingConfig):
     @property
     def read_gpio_17(self):
         return GPIO.input(self.GPIO17)
-
-    @property
-    def read_gpio_18(self):
-        if GPIO.gpio_function(self.GPIO18) != GPIO.IN:
-            GPIO.setup(self.GPIO18, GPIO.IN)
-
-        return GPIO.input(self.GPIO18)
 
     def _teardown(self):
         GPIO.cleanup([pin for pin, dir in self.CHANNELS])
