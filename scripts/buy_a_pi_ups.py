@@ -98,8 +98,9 @@ class BuyAPiUPS(LoggingConfig):
 
                     if (self.pwr_lost_time
                         and (self.pwr_lost_time + self.timeout) <= now):
-                        log.warn("RPi Power lost at: %s, Shoutdown at: %s",
-                                 self.pwr_lost_time, now)
+                        self.log.warn(
+                            "RPi Power lost at: %s, Shoutdown at: %s",
+                            self.pwr_lost_time, now)
                         os.system("sudo poweroff")
                         break
                 elif self.exit_no_ups:
