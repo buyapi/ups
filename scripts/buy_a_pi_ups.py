@@ -5,6 +5,7 @@
 
 import logging
 import os
+import signal
 import sys
 
 from datetime import datetime, timedelta
@@ -51,9 +52,9 @@ class BuyAPiUPS(LoggingConfig):
     GPIO27 = 27
     GPIO18 = 18
     CHANNELS = [(GPIO17, GPIO.IN), (GPIO27, GPIO.IN), (GPIO18, GPIO.OUT)]
-    _ITERATIONS = 6 # Number of time to run UPS online check.
-    _WINDOW = 2 # Allowable diviation from normal.
-    _DEFAULT_TIMEOUT = 60
+    _ITERATIONS = 6 # Number of times to run UPS online check.
+    _WINDOW = 2 # Allowable deviation from normal.
+    _DEFAULT_TIMEOUT = 60 # 60 seconds
 
     def __init__(self, log_file=DEFAULT_LOG_FILE, exit_no_ups=False,
                  timeout=_DEFAULT_TIMEOUT, debug=False):
@@ -71,13 +72,15 @@ class BuyAPiUPS(LoggingConfig):
         self.exit_no_ups = exit_no_ups
         self.timeout = timedelta(seconds=timeout)
         self.pwr_lost_time = None
+        self.terminate = False
+        signal.signal(signal.SIGTERM, self.handle_terminate_signal)
 
     def run(self):
-        self.log.info("Starting PiShop UPS...")
+        self.log.info("Starting BuyAPi UPS...")
         self._setup()
 
         try:
-            while True:
+            while not self.terminate:
                 running = self._is_ups_running()
 
                 # UPS is running.
@@ -88,15 +91,18 @@ class BuyAPiUPS(LoggingConfig):
                     else:
                         self.pwr_lost_time = None
 
-                    self.log.debug("pwr_lost_time: %s, timeout: %s",
-                                   self.pwr_lost_time, self.timeout)
+                    self.log.debug("pwr_lost_time: %s, timeout: %s "
+                                   "GPIO 17: %s, GPIO 18: %s",
+                                   self.pwr_lost_time, self.timeout,
+                                   self.read_gpio_17, self.read_gpio_18)
                     now = datetime.now()
 
                     if (self.pwr_lost_time
                         and (self.pwr_lost_time + self.timeout) <= now):
                         log.warn("RPi Power lost at: %s, Shoutdown at: %s",
                                  self.pwr_lost_time, now)
-                        #os.system("sudo poweroff")
+                        os.system("sudo poweroff")
+                        break
                 elif self.exit_no_ups:
                     self.log.info("No UPS HAT waiting to exit.")
                     break
@@ -104,7 +110,7 @@ class BuyAPiUPS(LoggingConfig):
             self.log.warn("Exception raised: %s", e, exc_info=True)
         finally:
             self._teardown()
-            self.log.info("...Existing PiShop UPS")
+            self.log.info("...Existing BuyAPi UPS")
 
     def _setup(self):
         GPIO.setwarnings(False)
@@ -117,7 +123,7 @@ class BuyAPiUPS(LoggingConfig):
         toggle_low = 0
 
         for i in range(0, self._ITERATIONS):
-            value = GPIO.input(self.GPIO27)
+            value = self.read_gpio_17
 
             if value == 1:
                 toggle_high += 1
@@ -135,14 +141,27 @@ class BuyAPiUPS(LoggingConfig):
         return abs(high - low) <= self._WINDOW
 
     def _is_power_failure(self):
-        value = GPIO.input(self.GPIO17)
+        value = self.read_gpio_17
         self.log.debug("GPIO17 value: %s", value)
         return value == 1
+
+    @property
+    def read_gpio_17(self):
+        return GPIO.input(self.GPIO17)
+
+    @property
+    def read_gpio_18(self):
+        if GPIO.gpio_function(GPIO18) != GPIO.IN:
+            GPIO.setup(GPIO18, GPIO.IN)
+
+        return GPIO.input(self.GPIO18)
 
     def _teardown(self):
         GPIO.cleanup([pin for pin, dir in self.CHANNELS])
 
-
+    def handle_terminate_signal(self, signum, frame):
+        self.log.info("SIGTERM detected shutting down script.")
+        self.terminate = True
 
 
 if __name__ == '__main__':
