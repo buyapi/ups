@@ -123,7 +123,7 @@ class BuyAPiUPS(LoggingConfig):
         toggle_low = 0
 
         for i in range(0, self._ITERATIONS):
-            value = self.read_gpio_17
+            value = GPIO.input(self.GPIO27)
 
             if value == 1:
                 toggle_high += 1
