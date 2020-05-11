@@ -77,7 +77,7 @@ class BuyAPiUPS(LoggingConfig):
         signal.signal(signal.SIGTERM, self.handle_terminate_signal)
 
     def run(self):
-        start_dt = datetime.now().isoformat()
+        start_dt = datetime.now()
         self.log.info("Starting BuyAPi UPS at %s...", start_dt)
         self._setup()
 
@@ -113,7 +113,7 @@ class BuyAPiUPS(LoggingConfig):
             self.log.warn("Exception raised: %s", e, exc_info=True)
         finally:
             self._teardown()
-            end_dt = datetime.now().isoformat()
+            end_dt = datetime.now()
             self.log.info("...Existing BuyAPi UPS at %s", end_dt)
 
             if self.shutdown:
