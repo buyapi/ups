@@ -34,7 +34,7 @@ install-shell:
 	install -m 755 $(SRC_DIR)/ups $(INIT_DIR)
 	rm -f $(SRC_DIR)/ups
 	update-rc.d ups defaults
-	/etc/init.d/ups start
+	service ups start
 
 install-py:
 	install -d $(BIN_DIR)
@@ -47,7 +47,7 @@ install-py:
 	install -m 755 scripts/ups $(INIT_DIR)
 	rm -f $(SRC_DIR)/ups
 	update-rc.d ups defaults
-	/etc/init.d/ups start
+	service ups start
 
 clean	:
 	$(shell $(RM_CMD))
