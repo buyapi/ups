@@ -39,7 +39,7 @@ is_ups_running() {
     toggle_lo=0
     count=6
 
-    while $count -ge 1; do
+    while [ $count -ge 1 ]; do
         value=$(cat /sys/class/gpio/gpio27/value)
 
         if [ value -eq 1 ]; then
