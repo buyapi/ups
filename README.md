@@ -1,6 +1,7 @@
 # Buy A Pi UPS
 
 Can be found in Canada at: [https://www.buyapi.ca/]
+
 And in the United States at: [https://www.pishop.us/]
 
 ## The bash Script
@@ -39,20 +40,24 @@ the bash script.
   1. This script can be run as the `pi` user, however you must change the
      logging path to the `pi` user also. This allows debugging without the
      need for root privileges.
-  2. Change the log path with the `-l /path/to/my/log/file`.
+  2. Change the log path with the `-l /path/to/my/log/file`. Use absolute
+     paths only, do not use `..`.
   3. It has multiple logging levels, the DEBUG level can be turned on with
-     the `-D` argument.
-  4. The log path will be created if it does not exist already, but
-     permissions to the full path are a necessity for this to work.
+     the `-D` argument. The default level is `INFO`.
+  4. The log path will be created if it does not exist already, but correct
+     permissions to any new directories in the path are a necessity for this
+     to work.
   5. The script will terminate if it does not find the UPS HAT connected,
      however, if this causes issues this feature can be turned off with the
      `-e False` argument.
-  6. The delay before shutting down can be changed with the `-d 600` argument.
-  7. A SIGTERM can be sent to the script to stop it (kill <pid>).
+  6. The delay before shutting down can be changed with the `-d 600`
+     (10 minutes) argument.
+  7. A SIGTERM can be sent to the script to stop it (kill pid). This will
+     not shutdown the RPi.
 
 The help menu:
 
-```bash
+```
 $ ./scripts/buy_a_pi_ups.py --help
 usage: buy_a_pi_ups.py [-h] [-l LOG_FILE] [-d DELAY] [-e] [-D]
 
@@ -72,4 +77,4 @@ optional arguments:
                         (default is INFO level).
 ```
 
-[Installation](INSTALL.md)
+[Installation Instructions](INSTALL.md)

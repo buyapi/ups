@@ -7,6 +7,8 @@
 *.pdf
 .~lock.*
 logs/*.log*
+scripts/ups
+scripts/ups.tmp
 old
 
 # C extensions

@@ -1,4 +1,4 @@
-# Installation
+# Installation Instructions
 
 
 #change the permissions for the script 
