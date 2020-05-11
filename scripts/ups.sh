@@ -39,10 +39,10 @@ is_ups_running() {
     toggle_lo=0
     count=6
 
-    while [ $count -ge 1 ]; do
+    while [[ $count -ge 1 ]]; do
         value=$(cat /sys/class/gpio/gpio27/value)
 
-        if [ value -eq 1 ]; then
+        if [[ $value -eq 1 ]]; then
             let toggle_hi=$toggle_hi+1
         else
             let toggle_lo=$toggle_lo+1
@@ -55,7 +55,7 @@ is_ups_running() {
 
     let value=$toggle_hi-$toggle_lo
 
-    if [ ${value#-} -le 2 ]; then
+    if [[ ${value#-} -le 2 ]]; then
         result=1
     else
         result=0
@@ -73,34 +73,33 @@ do
     # Normally, UPS toggles this pin every 0.5s
     is_ups_running
 
-    if [ $? -eq 0 ]; then
-        printf "DEBUG--ups_online_timer: %s\n" $ups_online_timer >> $LOG_FILE
+    if [[ $? -eq 0 ]]; then
+        #printf "DEBUG--ups_online_timer: %s\n" $ups_online_timer >> $LOG_FILE
         printf "UPS HAT offline. Exiting\n" >> $LOG_FILE
         exit 0
     fi
 
     # Read GPIO17 pin value
     power_failed=$(cat /sys/class/gpio/gpio17/value)
-    printf "power_failed: %s\n" $power_failed >> $LOG_FILE
+    #printf "DEBUG--power_failed: %s\n" $power_failed >> $LOG_FILE
 
-    if [ $power_failed -eq 1 ]; then
-        if [ "$lost_time" == "" ]; then
+    if [[ $power_failed -eq 1 ]]; then
+        if [[ "$lost_time" == "" ]]; then
             lost_time=$(date +"%Y-%m-%dT%H:%M:%S.%N%:z")
         fi
     else
         lost_time=""
     fi
 
-    if [ $lost_time != "" ]; then
+    if [[ $lost_time != "" ]]; then
         now=$(date +"%Y-%m-%dT%H:%M:%S.%N%:z")
         let new_delay=$delay*1000000000
         let time_delta=$(timestamp $lost_time)+$new_delay
 
         # If power was not restored in $delay seconds
-        if [ $time_delta -le $(timestamp $now) ]; then
-            printf "Powering off...\n" >> $LOG_FILE
+        if [[ $time_delta -le $(timestamp $now) ]]; then
             printf "UPS Power lost at: %s, Shutting down at: %s\n" \
-                   $lost_time $now >> $LOG_FIL
+                   $lost_time $now >> $LOG_FILE
             sleep 2
             systemctl poweroff #turn off
             exit 0
