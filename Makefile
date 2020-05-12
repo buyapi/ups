@@ -13,6 +13,7 @@ RM_REGEX        = '(^.*.pyc$$)|(^.*~$$)|(.*\#$$)'
 RM_CMD          = find $(PREFIX) -regextype posix-egrep -regex $(RM_REGEX) \
                   -exec rm {} \;
 SRC_DIR		= scripts
+# This is the default on the Python script.
 DEF_DELAY	= 600
 
 #----------------------------------------------------------------------
@@ -32,8 +33,10 @@ install-shell:
 	@rm -f $(SRC_DIR)/ups.tmp
 	install -m 755 $(SRC_DIR)/ups $(INIT_DIR)
 	rm -f $(SRC_DIR)/ups
+	@service ups stop
 	update-rc.d ups defaults
 	service ups start
+	service ups status
 
 install-py:
 	install -d $(BIN_DIR)
@@ -45,8 +48,10 @@ install-py:
 	@rm -f $(SRC_DIR)/ups.tmp
 	install -m 755 $(SRC_DIR)/ups $(INIT_DIR)
 	rm -f $(SRC_DIR)/ups
+	@service ups stop
 	update-rc.d ups defaults
 	service ups start
+	service ups status
 
 #----------------------------------------------------------------------
 clean	:

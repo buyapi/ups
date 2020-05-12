@@ -13,7 +13,8 @@
 
 PROG=<SCRIPT_HERE>
 DAEMON="/usr/local/bin/$PROG"
-PIDFILE="/var/run/ups.pid"
+NAME="ups"
+PIDFILE="/var/run/$NAME.pid"
 OPTIONS=<OPTIONS_HERE>
 
 test -e $DAEMON || exit 0
@@ -35,8 +36,8 @@ start() {
 stop() {
     log_daemon_msg "Stopping $PROG"
 
-    if [ -s /var/run/ups.pid ]; then
-        RUNNING=$(cat /var/run/ups.pid)
+    if [ -s $PIDFILE ]; then
+        RUNNING=$(cat $PIDFILE)
 
         if [ -d /proc/$RUNNING ]; then
             kill 15 $RUNNING

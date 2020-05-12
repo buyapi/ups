@@ -1,4 +1,4 @@
-# Buy A Pi UPS
+# Buy a Pi UPS
 
 Can be found in Canada at: [https://www.buyapi.ca/]
 
