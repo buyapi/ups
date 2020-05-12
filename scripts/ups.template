@@ -39,10 +39,13 @@ stop() {
         RUNNING=$(cat /var/run/ups.pid)
 
         if [ -d /proc/$RUNNING ]; then
-            kill SIGTERM $RUNNING
+            kill 15 $RUNNING
+            sleep 1.0
 
             if [ -d /proc/$RUNNING ]; then
-                log_failure_msg "Could not stop pid: %s" $RUNNING
+                log_failure_msg " could not stop pid: $RUNNING"
+            else
+                rm -f $PIDFILE
             fi
         fi
     fi
