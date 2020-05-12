@@ -27,8 +27,8 @@ export PATH
 
 start() {
     log_daemon_msg "Starting $PROG"
-    start-stop-daemon --start --oknodo --quiet --background \
-                      --pidfile /var/run/$NAME.pid --exec $DAEMON -- $OPTIONS
+    start-stop-daemon --start --oknodo --quiet --background --make-pidfile \
+                      --pidfile $PIDFILE --exec $DAEMON -- $OPTIONS
     ret=$?
     log_end_msg $ret
     return $ret
@@ -37,7 +37,7 @@ start() {
 stop() {
     log_deamon_msg "Stopping $PROG"
     start-stop-daemon --stop --retry 5 --oknodo --quiet \
-                      --pidfile /var/run/$NAME.pid --exec $DAEMON0
+                      --pidfile $PIDFILE --exec $DAEMON
     ret=$?
     log_end_msg $ret
     return $ret
