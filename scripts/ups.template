@@ -8,7 +8,7 @@
 # Short-Description: UPS Monitor
 # Description: Starts the Buy A Pi UPS HAT Monitor
 ### END INIT INFO
-# Start script for the UPS 
+# Start script for the UPS
 #
 
 PROG=<SCRIPT_HERE>
@@ -25,33 +25,22 @@ export PATH
 . /lib/lsb/init-functions
 
 
-start_stop_ups() {
-    start-stop-daemon "$@" --pidfile $PIDFILE --exec $DAEMON -- \
-                      $OPTIONS --pid-file $PIDFILE
-}
-
 start() {
-    log_action_begin_msg "Starting $PROG"
-
-    if ! start_stop_ups --start --oknodo --quiet --background ; then
-	log_action_end_msg 1 "No valid UPS entries defined."
-	return 1
-    fi
-
-    log_end_msg 0
-    return 0
+    log_daemon_msg "Starting $PROG"
+    start-stop-daemon --start --oknodo --quiet --background \
+                      --pidfile /var/run/$NAME.pid --exec $DAEMON -- $OPTIONS
+    ret=$?
+    log_end_msg $ret
+    return $ret
 }
 
 stop() {
-    log_action_begin_msg "Stopping $PROG"
-
-    if ! start_stop_ups --stop --retry 5 --oknodo --quiet ; then
-	log_action_end_msg 1
-	return 1
-    fi
-
-    log_end_msg 0
-    return 0
+    log_deamon_msg "Stopping $PROG"
+    start-stop-daemon --stop --retry 5 --oknodo --quiet \
+                      --pidfile /var/run/$NAME.pid --exec $DAEMON0
+    ret=$?
+    log_end_msg $ret
+    return $ret
 }
 
 case "$1" in
