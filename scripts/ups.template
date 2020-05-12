@@ -13,14 +13,12 @@
 
 PROG=<SCRIPT_HERE>
 DAEMON="/usr/local/bin/$PROG"
-NAME="python3"
 PIDFILE="/var/run/ups.pid"
 OPTIONS=<OPTIONS_HERE>
 
 test -e $DAEMON || exit 0
 
-PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin
-export PATH
+export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin
 
 . /lib/lsb/init-functions
 
@@ -36,8 +34,21 @@ start() {
 
 stop() {
     log_daemon_msg "Stopping $PROG"
-    start-stop-daemon --stop --retry 5 --oknodo --quiet --pidfile $PIDFILE \
-                      --exec $DAEMON
+
+    if [ -s /var/run/ups.pid ]; then
+        RUNNING=$(cat /var/run/ups.pid)
+
+        if [ -d /proc/$RUNNING ]; then
+            kill SIGTERM $RUNNING
+
+            if [ -d /proc/$RUNNING ]; then
+                log_failure_msg "Could not stop pid: %s" $RUNNING
+            fi
+        fi
+    fi
+
+    #start-stop-daemon --stop --retry 5 --oknodo --quiet --pidfile $PIDFILE \
+    #                  --exec $DAEMON
     ret=$?
     log_end_msg $ret
     return $ret
