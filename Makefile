@@ -48,8 +48,10 @@ install-py:
 	update-rc.d ups defaults
 	service ups start
 
+#----------------------------------------------------------------------
 clean	:
 	$(shell $(RM_CMD))
 
+#----------------------------------------------------------------------
 clobber : clean
 	@rm -f $(LOGS_DIR)/*.log*

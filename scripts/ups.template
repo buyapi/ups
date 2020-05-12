@@ -13,8 +13,8 @@
 
 PROG=<SCRIPT_HERE>
 DAEMON="/usr/local/bin/$PROG"
-NAME=ups
-PIDFILE="/var/run/$NAME.pid"
+NAME="python3"
+PIDFILE="/var/run/ups.pid"
 OPTIONS=<OPTIONS_HERE>
 
 test -e $DAEMON || exit 0
@@ -35,9 +35,9 @@ start() {
 }
 
 stop() {
-    log_deamon_msg "Stopping $PROG"
-    start-stop-daemon --stop --retry 5 --oknodo --quiet \
-                      --pidfile $PIDFILE --exec $DAEMON
+    log_daemon_msg "Stopping $PROG"
+    start-stop-daemon --stop --retry 5 --oknodo --quiet --pidfile $PIDFILE \
+                      --exec $DAEMON
     ret=$?
     log_end_msg $ret
     return $ret

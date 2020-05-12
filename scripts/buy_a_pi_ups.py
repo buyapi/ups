@@ -90,7 +90,11 @@ class BuyAPiUPS(LoggingConfig):
                     if self._is_power_failure():
                         if self.pwr_lost_time is None:
                             self.pwr_lost_time = datetime.now()
-                    else:
+                            self.log.warn("RPi Power lost at: %s",
+                                          self.pwr_lost_time )
+                    elif self.pwr_lost_time:
+                        self.log.info("RPi Power restored at: %s",
+                                      datetime.now())
                         self.pwr_lost_time = None
 
                     self.log.debug(
