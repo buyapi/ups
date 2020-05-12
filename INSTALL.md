@@ -32,4 +32,6 @@ Look for the *delay* variable and change it to what ever you want.
 $ sudo make install-shell
 ```
 
-That's it, the UPS Monitor should be installed and up and running.
+That's it, the UPS Monitor should be installed and running.
+
+[README](README.md)

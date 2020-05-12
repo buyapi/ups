@@ -33,6 +33,7 @@ install-shell:
 	@rm -f $(SRC_DIR)/ups.tmp
 	install -m 755 $(SRC_DIR)/ups $(INIT_DIR)
 	rm -f $(SRC_DIR)/ups
+	systemctl daemon-reload
 	@service ups stop
 	update-rc.d ups defaults
 	service ups start
@@ -48,6 +49,7 @@ install-py:
 	@rm -f $(SRC_DIR)/ups.tmp
 	install -m 755 $(SRC_DIR)/ups $(INIT_DIR)
 	rm -f $(SRC_DIR)/ups
+	systemctl daemon-reload
 	@service ups stop
 	update-rc.d ups defaults
 	service ups start
