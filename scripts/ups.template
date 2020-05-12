@@ -33,7 +33,7 @@ start_stop_ups() {
 start() {
     log_action_begin_msg "Starting $PROG"
 
-    if ! start_stop_ips --start --oknodo --quiet --background ; then
+    if ! start_stop_ups --start --oknodo --quiet --background ; then
 	log_action_end_msg 1 "No valid UPS entries defined."
 	return 1
     fi

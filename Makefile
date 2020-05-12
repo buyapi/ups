@@ -20,8 +20,7 @@ all	: tar
 
 #----------------------------------------------------------------------
 tar	: clean
-	@(cd ..; tar -czvf ${BASE_DIR}-${VERSION}.tar.gz --exclude=".git" \
-          ${BASE_DIR})
+	@(cd ..; tar -czvf ${BASE_DIR}.tar.gz --exclude=".git" ${BASE_DIR})
 
 #----------------------------------------------------------------------
 install-shell:
@@ -38,13 +37,13 @@ install-shell:
 
 install-py:
 	install -d $(BIN_DIR)
-	install -b -m 755 scripts/buy_a_pi_ups.py $(BIN_DIR)
+	install -b -m 755 $(SRC_DIR)/buy_a_pi_ups.py $(BIN_DIR)
 	@sed 's/<SCRIPT_HERE>/"buy_a_pi_ups.py"/' $(SRC_DIR)/ups.template > \
              $(SRC_DIR)/ups.tmp
 	@sed 's/<OPTIONS_HERE>/"--delay=$(DEF_DELAY)"/' $(SRC_DIR)/ups.tmp > \
              $(SRC_DIR)/ups
 	@rm -f $(SRC_DIR)/ups.tmp
-	install -m 755 scripts/ups $(INIT_DIR)
+	install -m 755 $(SRC_DIR)/ups $(INIT_DIR)
 	rm -f $(SRC_DIR)/ups
 	update-rc.d ups defaults
 	service ups start
