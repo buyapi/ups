@@ -104,10 +104,8 @@ class BuyAPiUPS(LoggingConfig):
 
                     if (self.pwr_lost_time
                         and (self.pwr_lost_time + self.delay) <= now):
-                        self.log.warn("RPi Power lost at: %s, "
-                                      "Shutdown at: %s, elapsed time: %s",
-                                      self.pwr_lost_time, now,
-                                      now - self.pwr_lost_time)
+                        self.log.warn("Shutdown at: %s, elapsed time: %s",
+                                      now, now - self.pwr_lost_time)
                         self.shutdown = True
                         break
                 elif self.exit_no_ups:
