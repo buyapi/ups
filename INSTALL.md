@@ -10,7 +10,7 @@ Since there are two options to use for the UPS Monitor there is a slight
 difference in how they are installed.
 
 ```bash
-$ cd /path/to/usb
+$ cd /path/to/buy_a_pi_usb
 ```
 
 ## The Python Script
