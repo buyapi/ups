@@ -3,6 +3,8 @@
 #
 # Development by Carl J. Nobile
 #
+# When installing either version this Makefile must be run as the root user.
+#
 
 PREFIX		= $(shell pwd)
 BASE_DIR	= $(shell echo $${PWD\#\#*/})
